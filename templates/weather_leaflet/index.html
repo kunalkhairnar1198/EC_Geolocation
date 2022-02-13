@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Weather Data</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+       
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+    <style>
+        .container{
+            margin: 50px;
+            border: 1px solid black;
+            padding: 10px;
+        }
+        .map{
+            height: 80vh;
+        }
+
+       
+    </style>
+    </head>
+    <body>
+        <h2 style="text-align: center;">Show Weather By Location</h2>
+        <div class="container">
+            <div class="map" id="mapid">
+            </div>
+        </div>
+    </body>
+    <script>
+            var map = L.map('mapid').setView([37,-95], 4);
+            
+            var data = '{{ data_to_display|safe }}'; 
+            var weather = {{ weather_to_display|safe }};
+            
+            var array = JSON.parse("[" + data + "]");
+
+            var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox/streets-v11',
+                tileSize: 512,
+                zoomOffset: -1
+            }).addTo(map);
+
+
+            let l = array[0].length;
+            
+            for (let i = 0 ;i < l; i++) {
+
+                var pop = L.popup({
+                closeOnclick:true
+                }).setContent('<h4>Name:'+weather[i].name+'</h4><p>Temperature:'+weather[i].temperature+'&#8457;</p><p>Forecast:'+weather[i].forecast+'</p>');
+
+                var marker = L.marker(array[0][i]).addTo(map).bindPopup(pop);
+            }
+    </script>
+</html>
